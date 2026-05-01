@@ -1,0 +1,41 @@
+models/retinal_oct_classifier_finetuned.keras
+→ Body part: Eye (Retina)
+→ Image type: OCT (Optical Coherence Tomography)
+
+models/brain_mri_classifier_b3.keras
+→ Body part: Brain
+→ Image type: MRI
+
+models/chest_pneumonia_classifier_b3.keras
+→ Body part: Chest (Lungs)
+→ Image type: X-ray
+→ Task: Binary (Normal vs Pneumonia)
+
+models/covid_radiography_classifier.keras
+→ Body part: Chest (Lungs)
+→ Image type: X-ray
+→ Task: Multi-class (COVID, Lung Opacity, Normal, Viral Pneumonia)
+
+models/kidney_ct_classifier.keras
+→ Body part: Kidney
+→ Image type: CT (Computed Tomography)
+
+models/oral_cancer_classifier_b3.keras
+→ Body part: Oral cavity (Mouth)
+→ Image type: Clinical images (photographic)
+
+models/breast_cancer_best.keras
+→ Body part: Breast
+→ Image type: Histopathology / microscopic images
+
+models/skin_best.keras
+→ Body part: Skin
+→ Image type: Clinical images (dermatological photos)
+
+Eye        → OCT
+Brain      → MRI
+Chest      → X-ray (2 models)
+Kidney     → CT
+Breast     → Histopathology
+Oral       → Clinical images
+Skin       → Clinical images
