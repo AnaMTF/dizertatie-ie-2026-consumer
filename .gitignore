@@ -1,0 +1,5 @@
+# large model files
+models/*.keras
+
+# python cache
+__pycache__
