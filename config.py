@@ -76,11 +76,12 @@ MODEL_CATALOG = {
 MODEL_MAPPING_EXACT = {
     "MRI|Head / Brain": "brain_mri_b3",
     "CT Scan|Abdomen": "kidney_ct",
-    "X-Ray|Chest": "chest_pneumonia_b3",
+    "X-Ray|Chest": ["chest_pneumonia_b3", "covid_radiography"],
     "Mammography|Chest": "breast_cancer",
 }
 
 # Fallback by image type when body part granularity is too broad.
+# Each mapping value can be a model key string or a list of model keys.
 MODEL_MAPPING_BY_IMAGE_TYPE = {
     "Mammography": "breast_cancer",
 }
