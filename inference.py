@@ -25,6 +25,25 @@ class ModelRegistry:
         self.covid_route_keywords = tuple(covid_route_keywords or ())
         self.models = {}
 
+    def _normalize_model_keys(self, mapped_value):
+        if isinstance(mapped_value, str):
+            keys = [mapped_value]
+        elif isinstance(mapped_value, (list, tuple, set)):
+            keys = [item for item in mapped_value if isinstance(item, str) and item]
+        else:
+            keys = []
+
+        deduped = []
+        seen = set()
+
+        for model_key in keys:
+            if model_key in seen:
+                continue
+            deduped.append(model_key)
+            seen.add(model_key)
+
+        return deduped
+
     def _mapping_key(self, image_type, body_part):
         image = image_type or ""
         body = body_part or ""
@@ -38,49 +57,75 @@ class ModelRegistry:
 
         return model_config
 
-    def _maybe_override_chest_model(self, image_type, body_part, file_path, model_key):
-        if model_key != "chest_pneumonia_b3":
-            return model_key
+    def _maybe_override_chest_models(self, image_type, body_part, file_path, model_keys):
+        if "chest_pneumonia_b3" not in model_keys:
+            return model_keys
 
         if image_type != "X-Ray" or body_part != "Chest":
-            return model_key
+            return model_keys
 
         if "covid_radiography" not in self.model_catalog:
-            return model_key
+            return model_keys
 
         lowered_path = (file_path or "").lower()
         if any(keyword in lowered_path for keyword in self.covid_route_keywords):
-            return "covid_radiography"
+            # Keep backward-compatible behavior for single-model chest routing.
+            if model_keys == ["chest_pneumonia_b3"]:
+                return ["covid_radiography"]
 
-        return model_key
+            if "covid_radiography" not in model_keys:
+                return [*model_keys, "covid_radiography"]
 
-    def resolve_model(self, image_type, body_part, file_path=""):
+        return model_keys
+
+    def resolve_models(self, image_type, body_part, file_path=""):
         route_key = self._mapping_key(image_type, body_part)
-        model_key = self.exact_mapping.get(route_key)
+        mapped_value = self.exact_mapping.get(route_key)
 
-        if not model_key:
+        if mapped_value is None:
             image_route = image_type or ""
-            model_key = self.image_type_mapping.get(image_route)
+            mapped_value = self.image_type_mapping.get(image_route)
             route_key = image_route
 
-        if not model_key and self.default_model_key:
-            model_key = self.default_model_key
+        model_keys = self._normalize_model_keys(mapped_value)
+
+        if not model_keys and self.default_model_key:
+            model_keys = self._normalize_model_keys(self.default_model_key)
             route_key = "default"
 
-        if not model_key:
+        if not model_keys:
             raise UnsupportedRouteError(
                 f"Unsupported model mapping for imageType={image_type!r}, bodyPart={body_part!r}"
             )
 
-        model_key = self._maybe_override_chest_model(
+        model_keys = self._maybe_override_chest_models(
             image_type=image_type,
             body_part=body_part,
             file_path=file_path,
-            model_key=model_key,
+            model_keys=model_keys,
         )
 
-        model_config = self._resolve_model_config(model_key)
-        return route_key, model_key, model_config
+        resolved = []
+        for model_key in model_keys:
+            model_config = self._resolve_model_config(model_key)
+            resolved.append(
+                {
+                    "routeKey": route_key,
+                    "modelKey": model_key,
+                    "modelConfig": model_config,
+                }
+            )
+
+        return resolved
+
+    def resolve_model(self, image_type, body_part, file_path=""):
+        resolved = self.resolve_models(
+            image_type=image_type,
+            body_part=body_part,
+            file_path=file_path,
+        )
+        first = resolved[0]
+        return first["routeKey"], first["modelKey"], first["modelConfig"]
 
     def missing_model_paths(self):
         missing = []
