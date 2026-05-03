@@ -1,0 +1,5 @@
+colon_adenocarcinoma
+colon_benign_tissue
+lung_adenocarcinoma
+lung_benign_tissue
+lung_squamous_cell_carcinoma

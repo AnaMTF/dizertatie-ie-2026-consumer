@@ -1,0 +1,8 @@
+amd
+cataract
+diabetes
+glaucoma
+hypertension
+normal
+other
+pathological_myopia

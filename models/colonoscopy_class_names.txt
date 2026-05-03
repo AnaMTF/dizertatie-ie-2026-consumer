@@ -1,0 +1,8 @@
+dyed_lifted_polyps
+dyed_resection_margins
+esophagitis
+normal_cecum
+normal_pylorus
+normal_z_line
+polyps
+ulcerative_colitis

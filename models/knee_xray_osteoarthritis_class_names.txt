@@ -1,0 +1,5 @@
+doubtful
+mild
+moderate
+normal
+severe

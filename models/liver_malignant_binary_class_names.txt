@@ -1,0 +1,2 @@
+malignant
+non_malignant

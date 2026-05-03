@@ -1,0 +1,10 @@
+avulsion_fracture
+comminuted_fracture
+fracture_dislocation
+greenstick_fracture
+hairline_fracture
+impacted_fracture
+longitudinal_fracture
+oblique_fracture
+pathological_fracture
+spiral_fracture
