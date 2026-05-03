@@ -196,6 +196,7 @@ MODEL_MAPPING_EXACT = {
     "Clinical photo|Oral cavity": "oral_cancer_b3",
     "Dermoscopy|Skin": "skin_best",
     "Echocardiography|Heart": "heart_abnormal_binary",
+    "Endoscopy|Colon": "colonoscopy_finetuned",
 }
 
 MODEL_MAPPING_BY_IMAGE_TYPE = {}
