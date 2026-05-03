@@ -1,0 +1,4 @@
+cyst
+normal
+stone
+tumor

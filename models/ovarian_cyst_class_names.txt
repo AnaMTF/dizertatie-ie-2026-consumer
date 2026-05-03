@@ -1,0 +1,5 @@
+complex_cyst
+dominant_follicle
+healthy
+poly_cyst
+simple_cyst
