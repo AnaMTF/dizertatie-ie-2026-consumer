@@ -61,7 +61,7 @@ class ModelRegistry:
         if "chest_pneumonia_b3" not in model_keys:
             return model_keys
 
-        if image_type != "X-Ray" or body_part != "Chest":
+        if image_type != "X-Ray" or body_part != "Chest / lungs":
             return model_keys
 
         if "covid_radiography" not in self.model_catalog:
@@ -203,8 +203,22 @@ def _decode_prediction(logits, task, class_names):
     safe_names = list(class_names or [])
 
     if task == "binary" or values.size == 1:
-        positive_prob = float(np.clip(values[0], 0.0, 1.0))
-        negative_prob = float(1.0 - positive_prob)
+        if values.size == 1:
+            positive_prob = float(np.clip(values[0], 0.0, 1.0))
+            negative_prob = float(1.0 - positive_prob)
+        elif values.size == 2:
+            if np.any(values < 0.0) or np.any(values > 1.0) or not np.isclose(float(np.sum(values)), 1.0, atol=1e-3):
+                shifted = values - np.max(values)
+                exp_values = np.exp(shifted)
+                probabilities = exp_values / np.sum(exp_values)
+            else:
+                total = float(np.sum(values))
+                probabilities = values / total if total > 0.0 else np.array([0.5, 0.5], dtype=np.float32)
+
+            negative_prob = float(probabilities[0])
+            positive_prob = float(probabilities[1])
+        else:
+            raise ValueError(f"Binary model produced {values.size} outputs; expected 1 or 2")
 
         if len(safe_names) >= 2:
             negative_label, positive_label = safe_names[0], safe_names[1]
