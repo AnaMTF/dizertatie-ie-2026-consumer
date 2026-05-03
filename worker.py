@@ -103,6 +103,28 @@ def resolve_file_path(image, storage):
     return resolved
 
 
+def build_image_result(image, image_type, body_part, model_key, route_key, prediction):
+    return {
+        "imageUuid": image.get("imageUuid"),
+        "imageType": image_type,
+        "bodyPart": body_part,
+        "modelKey": model_key,
+        "routeKey": route_key,
+        "prediction": prediction,
+    }
+
+
+def build_image_error(image, image_type, body_part, model_key, route_key, error):
+    return {
+        "imageUuid": image.get("imageUuid"),
+        "imageType": image_type,
+        "bodyPart": body_part,
+        "modelKey": model_key,
+        "routeKey": route_key,
+        "error": str(error),
+    }
+
+
 def process_scan_job(payload, model_registry):
     images = payload.get("images")
     image_type = payload.get("imageType")
@@ -136,36 +158,36 @@ def process_scan_job(payload, model_registry):
                     prediction = predict_image(resolved_path, model, model_config)
 
                     image_results.append(
-                        {
-                            "imageUuid": image.get("imageUuid"),
-                            "imageType": image_type,
-                            "bodyPart": body_part,
-                            "modelKey": model_key,
-                            "routeKey": route_key,
-                            "prediction": prediction,
-                        }
+                        build_image_result(
+                            image=image,
+                            image_type=image_type,
+                            body_part=body_part,
+                            model_key=model_key,
+                            route_key=route_key,
+                            prediction=prediction,
+                        )
                     )
                 except Exception as exc:
                     image_errors.append(
-                        {
-                            "imageUuid": image.get("imageUuid"),
-                            "imageType": image_type,
-                            "bodyPart": body_part,
-                            "modelKey": model_key,
-                            "routeKey": route_key,
-                            "error": str(exc),
-                        }
+                        build_image_error(
+                            image=image,
+                            image_type=image_type,
+                            body_part=body_part,
+                            model_key=model_key,
+                            route_key=route_key,
+                            error=exc,
+                        )
                     )
         except Exception as exc:
             image_errors.append(
-                {
-                    "imageUuid": image.get("imageUuid"),
-                    "imageType": image_type,
-                    "bodyPart": body_part,
-                    "modelKey": None,
-                    "routeKey": None,
-                    "error": str(exc),
-                }
+                build_image_error(
+                    image=image,
+                    image_type=image_type,
+                    body_part=body_part,
+                    model_key=None,
+                    route_key=None,
+                    error=exc,
+                )
             )
 
     total_predictions = len(image_results) + len(image_errors)
