@@ -1,0 +1,33 @@
+services:
+  consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: consumer
+    restart: unless-stopped
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: app
+      RABBITMQ_PASS: app
+      RABBITMQ_VHOST: /
+      RABBITMQ_HEARTBEAT: 60
+      RABBITMQ_BLOCKED_TIMEOUT: 120
+      RABBITMQ_JOB_QUEUE: scan.jobs.v1
+      RABBITMQ_RESULT_QUEUE: scan.results.v1
+      RABBITMQ_DLX: scan.dlx
+      RABBITMQ_JOB_DLQ: scan.jobs.v1.dlq
+      RABBITMQ_RESULT_DLQ: scan.results.v1.dlq
+      WORKER_PREFETCH: 1
+    volumes:
+      - dizertatie_uploads_data:/app/uploads:ro
+    networks:
+      - dizertatie_shared_net
+
+volumes:
+  dizertatie_uploads_data:
+    name: dizertatie_uploads_data
+
+networks:
+  dizertatie_shared_net:
+    name: dizertatie_shared_net
